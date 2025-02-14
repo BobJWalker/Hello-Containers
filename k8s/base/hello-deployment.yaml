@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-deployment  
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      component: hello-web
+  template:
+    metadata:
+      labels:
+        component: hello-web
+    spec:
+      containers:
+        - name: hello-web
+          image: bobjwalker99/hello-containers:latest
+          imagePullPolicy: "Always"
+          ports:
+           - containerPort: 8080
+             name: http-port
+          env:
+           - name: HELLO_SECRET_PHRASE
+             valueFrom:
+               secretKeyRef:
+                 name: hello-secrets
+                 key: homepageDisplay    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-app-cluster-ip-service  
+spec:
+  type: ClusterIP
+  selector:
+    component: hello-web
+  ports:
+    - port: 6801
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-ingress-nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: hello.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hello-app-cluster-ip-service
+                port:                
+                  number: 6801

@@ -15,6 +15,7 @@ WORKDIR "/src/HelloContainers.Web"
 RUN dotnet build "HelloContainers.Web.csproj" -c Release -o /app/build /p:Version=$APP_VERSION
 
 FROM build AS publish
+ARG APP_VERSION="0.0.1"
 RUN dotnet publish "HelloContainers.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false /p:Version=$APP_VERSION
 
 FROM base AS final

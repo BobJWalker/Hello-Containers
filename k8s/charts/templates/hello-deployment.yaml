@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hello-deployment  
 spec:
-  replicas: 1
+  replicas: {{ .Values.hello.image.replicas }}
   selector:
     matchLabels: 
       component: hello-web
@@ -14,17 +14,17 @@ spec:
     spec:
       containers:
         - name: hello-web
-          image: octopussamples/hello-containers:{{ default .Chart.AppVersion .Values.hello.image.tag }}
+          image: bobjwalker99/hello-containers:{{ default .Chart.AppVersion .Values.hello.image.tag }}
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "250m"
+              memory: {{ .Values.hello.image.resources.requests.memory }}
+              cpu: {{ .Values.hello.image.resources.requests.cpu }}
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: {{ .Values.hello.image.resources.limits.memory }}
+              cpu: {{ .Values.hello.image.resources.limits.cpu }}
           imagePullPolicy: "Always"
           ports:
-           - containerPort: 5000
+           - containerPort: {{ .Values.hello.service.targetPort }}
              name: http-port
           env:
            - name: HELLO_SECRET_PHRASE
@@ -42,8 +42,8 @@ spec:
   selector:
     component: hello-web
   ports:
-    - port: 6801
-      targetPort: 8080
+    - port: {{ .Values.hello.service.port }}
+      targetPort: {{ .Values.hello.service.targetPort }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -52,7 +52,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: hello.local
+  - host: {{ .Values.hello.ingress.host }}
     http:
       paths:
         - path: /
@@ -61,4 +61,4 @@ spec:
             service:
               name: hello-app-cluster-ip-service
               port:
-                number: 6801
+                number: {{ .Values.hello.service.port }}

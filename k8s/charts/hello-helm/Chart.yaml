@@ -1,5 +1,5 @@
 apiVersion: v2
-name: bobjwalker-hellocontainers # The chart name is also used as the repository name when publishing
+name: hello-helm # The chart name is also used as the repository name when publishing
 description: A simple .NET application used to learn Kubernetes deployments
 type: application
 # This is the chart version. This version number should be incremented each time you make changes

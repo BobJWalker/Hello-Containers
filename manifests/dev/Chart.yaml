@@ -8,4 +8,4 @@ version: 1.0.1
 dependencies:
 - name: hello-containers
   version: 1.0.0
-  repository: oci://registry-1.docker.io/bobjwalker99/hello-helm
+  repository: oci://ghcr.io/bobjwalker/hello-helm

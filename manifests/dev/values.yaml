@@ -1,7 +1,7 @@
 hello:
   homepageDisplaySecret: "blah"
   image:
-    tag: "1.0.0"
+    tag: "1.0.1"
     resources:
       requests:
         memory: "64Mi"
@@ -11,7 +11,7 @@ hello:
         cpu: "500m"
     replicas: 1
   ingress:
-    host: "hellotest.local"
+    host: "hello.local"
   service:
     port: 6801
     targetPort: 8080

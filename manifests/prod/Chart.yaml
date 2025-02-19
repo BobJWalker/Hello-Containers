@@ -1,8 +1,10 @@
 apiVersion: v2
-appVersion: "1.0.1"
+appVersion: 1.0.1
+
+name: hello-app
 description: A simple .NET application used to learn Kubernetes deployments
-name: hello-helm
-version: 1.0.0
+type: application
+version: 1.0.1
 dependencies:
 - name: hello-containers
   version: 1.0.0

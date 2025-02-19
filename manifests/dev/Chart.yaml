@@ -6,6 +6,6 @@ description: A simple .NET application used to learn Kubernetes deployments
 type: application
 version: 1.0.1
 dependencies:
-- name: hello-containers
+- name: hello-helm
   version: 1.0.0
-  repository: oci://ghcr.io/bobjwalker/hello-helm
+  repository: oci://ghcr.io/bobjwalker

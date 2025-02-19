@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hello-web
-          image: bobjwalker99/hello-containers:{{ default .Chart.AppVersion .Values.hello.image.tag }}
+          image: bobjwalker99/hello-containers:{{ .Values.hello.image.tag }}
           resources:
             requests:
               memory: {{ .Values.hello.image.resources.requests.memory }}

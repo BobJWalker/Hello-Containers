@@ -11,7 +11,7 @@ hello:
         cpu: "500m"
     replicas: 1
   ingress:
-    host: "hello.local"
+    host: "hellodev.local"
   service:
     port: 6801
     targetPort: 8080

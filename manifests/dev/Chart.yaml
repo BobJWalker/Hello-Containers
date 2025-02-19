@@ -6,5 +6,5 @@ type: application
 version: 1.0.1
 dependencies:
   - name: hello-helm
-    version: 1.0.1
+    version: 1.0.3
     repository: oci://ghcr.io/bobjwalker

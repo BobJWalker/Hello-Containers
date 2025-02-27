@@ -16,5 +16,11 @@ namespace HelloContainers.Tests
         {
             Assert.That(Quote.GetRandomQuote().QuoteText != "Something went wrong");
         }
+
+        [Test]
+        public void WhenGettingRandomQuote_AuthorIsNotSystem()
+        {
+            Assert.That(Quote.GetRandomQuote().QuoteText != "System");
+        }
     }
 }

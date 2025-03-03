@@ -14,9 +14,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\HelloContainers.Web\HelloContainers.Web.csproj" />      
-      <None Update="allureConfig.json">
+      <Content Include="allureConfig.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>    
+      </Content>    
     </ItemGroup>    
 
     

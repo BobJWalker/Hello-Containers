@@ -6,7 +6,7 @@ WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG APP_VERSION="0.0.1"
+ARG APP_VERSION="1.2.4"
 WORKDIR /src
 COPY ["HelloContainers.Web/HelloContainers.Web.csproj", "HelloContainers.Web/"]
 RUN dotnet restore "HelloContainers.Web/HelloContainers.Web.csproj"
@@ -15,7 +15,7 @@ WORKDIR "/src/HelloContainers.Web"
 RUN dotnet build "HelloContainers.Web.csproj" -c Release -o /app/build /p:Version=$APP_VERSION
 
 FROM build AS publish
-ARG APP_VERSION="0.0.1"
+ARG APP_VERSION="1.2.4"
 RUN dotnet publish "HelloContainers.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false /p:Version=$APP_VERSION
 
 FROM base AS final

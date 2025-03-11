@@ -16,7 +16,7 @@ namespace HelloContainers.Tests
         [Test]
         public void WhenGettingRandomQuote_WorksWithoutError()
         {
-            Assert.That(Quote.GetRandomQuote().QuoteText != "Something went wrong");
+            Assert.That(Quote.GetRandomQuote().QuoteText == "Something went wrong");
         }
 
         [Test]

@@ -6,7 +6,7 @@ WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG APP_VERSION="1.2.4"
+ARG APP_VERSION="1.3.0"
 WORKDIR /src
 COPY ["HelloContainers.Web/HelloContainers.Web.csproj", "HelloContainers.Web/"]
 RUN dotnet restore "HelloContainers.Web/HelloContainers.Web.csproj"

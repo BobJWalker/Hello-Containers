@@ -12,7 +12,7 @@ hello-helm:
           cpu: "500m"
       replicas: 1
     ingress:
-      host: "hellodev.local"
+      host: "hellotest.local"
     service:
       port: 6801
       targetPort: 8080

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hello-web
-          image: bobjwalker99/hello-containers:latest
+          image: bobjwalker99/hello-containers:1.4.5
           imagePullPolicy: "Always"
           ports:
            - containerPort: 8080

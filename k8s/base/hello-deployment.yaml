@@ -38,20 +38,18 @@ spec:
     - port: 6801
       targetPort: 8080
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: hello-ingress-nginx
+  name: hello-ingress-http-route
+  namespace: hello
 spec:
-  ingressClassName: nginx
+  parentRefs:
+  - name: public-gateway
+    namespace: traefik
+  hostnames:
+    - hello.bobjwalker.local
   rules:
-    - host: hello.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: hello-app-cluster-ip-service
-                port:                
-                  number: 6801
+    - backendRefs:
+        - name: hello-app-cluster-ip-service  
+          port: 6801 

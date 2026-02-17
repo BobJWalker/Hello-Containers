@@ -1,0 +1,228 @@
+# More examples of Codefresh YAML can be found at
+# https://codefresh.io/docs/docs/yaml-examples/examples/
+
+version: "1.0"
+# Stages can help you organize your steps in stages
+stages:
+  - "prep"
+  - "test"
+  - "build"
+  - "deploy"
+
+hooks:
+  on_fail:
+    steps:
+      exec:
+        type: slack-message-sender:0.0.6
+        arguments:
+          WEBHOOK_URL: "${{SLACK_URL}}"
+          MESSAGE: "Build failure for hello-containers"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "${{GITHUB_REPO}}"
+    # CF_BRANCH value is auto set when pipeline is triggered
+    # Learn more at codefresh.io/docs/docs/codefresh-yaml/variables/
+    revision: "${{CF_BRANCH}}"
+    git: "github-bobjwalker"
+    stage: "prep"
+    depth: 1     
+    
+  trivy_repo_scan:
+    title: Trivy Security Repo Scan
+    image: aquasec/trivy:0.59.1
+    stage: "prep"
+    enviornment:
+      - CI = true
+    commands:
+      - trivy repo "https://github.com/bobjwalker/hello-containers" --exit-code 0
+      
+  get_chart_version:
+    title: "Get the version of the chart"
+    image: mikefarah/yq:3.3.4
+    stage: "prep"
+    working_directory: ${{clone}}
+    commands:
+      - |
+        CVERSION=$(yq  r manifests/dev/Chart.yaml 'appVersion')
+        cf_export CVERSION=$CVERSION
+        export RND=$(( ( RANDOM % 100 )  + 1 ))
+        cf_export RND=$RND
+        echo "Random: $RND"
+        if [ $RND -le 7 ] ; then
+          cf_export PART="minor"
+        else
+          cf_export PART="patch"
+        fi
+  wait:
+    description: buffer for var to be exported properly
+    image: mikefarah/yq:3.3.4
+    stage: "prep"
+    commands:
+      - sleep 1
+      
+  bumpVersion:
+    title: "Creating version number"
+    type: semversioner:0.1.6
+    stage: "prep"
+    arguments:
+      SEMVERSIONER_VERSION: ${{CVERSION}}
+      SEMVERSIONER_ACTION: bump
+      SEMVERSIONER_PART: ${{PART}}
+
+  update_chart:
+    title: "Update the chart appversion to use the latest version"
+    working_directory: ${{clone}}
+    stage: "prep"
+    image: 'mikefarah/yq:3.3.4'
+    commands:
+      - |
+        APPVERSION="${{steps.bumpVersion.output.SEMVERSIONER_RESULT}}"
+        echo "The version is $APPVERSION"
+        cf_export APPVERSION=$APPVERSION
+        echo "Updating the chart to $APPVERSION"
+        yq w -i manifests/dev/Chart.yaml "appVersion" "$APPVERSION"
+        echo "Updating the image tag to $APPVERSION"
+        yq w -i manifests/dev/values.yaml "${{IMAGE_TAG_PATH}}" "$APPVERSION"
+
+  my_unit_tests:
+    title: Run Unit tests    
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    working_directory: '${{clone}}'
+    commands:
+      - |
+        dotnet test ${{UNIT_TEST_PROJECT}} --configuration Release
+        ls './allure-results'
+    stage: "test"  
+
+  upload_report:
+    title: Save Allure Unit Test Report
+    type: test-reporting:1.2.0
+    fail_fast: true
+    stage: "test"
+    working_directory: ${{clone}}
+    arguments:
+      allure_dir: "./allure-results"
+      bucket_name: "${{UPLOAD_BUCKET_NAME}}"
+      storage_integration: azure-file
+      branch: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    when:
+        condition:
+          any:
+            myCondition: workflow.result == 'running'
+            myTestCondition: steps.my_unit_tests.result == 'failure'
+
+  build:
+    title: "Building Docker image"
+    type: "build"
+    image_name: "${{DOCKER_IMAGE_NAME}}"
+    working_directory: "${{clone}}/src"
+    tag: "${{APPVERSION}}"
+    dockerfile: "${{DOCKER_FILE_PATH}}"
+    build_arguments:
+      - "APP_VERSION=${{APPVERSION}}"
+    stage: "build"  
+    
+  trivy_image_scan:
+    title: Trivy Security Image Scan
+    image: aquasec/trivy:0.59.1
+    stage: "build"
+    enviornment:
+      - CI = true
+    commands:
+      - trivy image ${{DOCKER_IMAGE_NAME}}:${{APPVERSION}} --exit-code 0
+
+  make_build_information:
+    title: "Make the build information file"
+    working_directory: ${{clone}}
+    stage: "deploy"
+    image: 'quay.io/codefreshplugins/curl-jq:1.2.3'
+    commands:
+      - |
+        # Set the Codefresh pipeline variables
+        GITHUB_REPO="$CF_REPO_OWNER/$CF_REPO_NAME"
+        GITHUB_BRANCH="$CF_BRANCH"
+        GITHUB_SHA="$CF_REVISION"
+        GITHUB_RUN_URL="$CF_BUILD_URL"
+        APP_VERSION="$APPVERSION"
+        PACKAGE_ID="${{DOCKER_IMAGE_NAME}}"
+
+        # Get commits from Codefresh environment variables
+        commits='[{"id": "'$CF_REVISION'", "web_url": "https://github.com/'"$GITHUB_REPO"'/commit/'"$CF_REVISION"'", "comment": "'$CF_COMMIT_MESSAGE'"}]'
+
+        # Create JSON payload
+        jsonPayload='{
+          "PackageId": "'"$PACKAGE_ID"'",
+          "Version": "'"$APP_VERSION"'",
+          "Branch": "'"$GITHUB_BRANCH"'",
+          "BuildUrl": "'"$GITHUB_RUN_URL"'",
+          "BuildNumber": "'"$CF_BUILD_ID"'",
+          "BuildEnvironment": "CodefreshCI",
+          "VcsCommitNumber": "'"$GITHUB_SHA"'",
+          "VcsType": "Git",
+          "VcsRoot": "https://github.com/$GITHUB_REPO",
+          "Commits": '"$commits"'
+        }'
+
+        # Write information to file
+        echo "$jsonPayload" | jq '.' > BuildInformation.json
+        echo "Build information saved to: $(realpath BuildInformation.json)"
+        head -n 5 BuildInformation.json
+
+  push-build-information:
+    title: "Push build info to Octopus Deploy"
+    type: octopusdeploy-push-build-information:1.0.1
+    stage: "deploy"
+    working_directory: ${{clone}}
+    arguments:
+      OCTOPUS_API_KEY: '${{OCTOPUS_API_KEY}}'
+      OCTOPUS_URL: '${{OCTOPUS_URL}}'
+      OCTOPUS_SPACE: '${{OCTOPUS_SPACE}}'
+      PACKAGE_IDS:
+        - ${{DOCKER_IMAGE_NAME}}        
+      FILE: BuildInformation.json
+      VERSION: ${{APPVERSION}}
+      OVERWRITE_MODE: fail
+
+  create-release:
+    title: "Create and Deploy release Octopus Deploy"
+    type: octopusdeploy-create-release:1.0.1
+    stage: "deploy"
+    arguments:
+      OCTOPUS_API_KEY: '${{OCTOPUS_API_KEY}}'
+      OCTOPUS_URL: '${{OCTOPUS_URL}}'
+      OCTOPUS_SPACE: '${{OCTOPUS_SPACE}}'
+      PROJECT: '${{OCTOPUS_PROJECT_NAME}}'
+      RELEASE_NUMBER: '${{APPVERSION}}'    
+
+  commit_and_push:
+    title: Commit changes and push
+    type: git-commit:0.1.4
+    stage: "deploy"
+    arguments:
+      repo: ${{GITHUB_REPO}}
+      git: github-bobjwalker
+      working_directory: "${{CF_VOLUME_PATH}}/${{CF_REPO_NAME}}"
+      commit_message: "Updating chart appVersion to ${{APPVERSION}}"
+      git_user_name: bobjwalker
+      git_user_email: bob.walker@octopus.com
+      allow_empty: true
+      force_push: true
+      add:
+        - manifests/dev/Chart.yaml
+        - manifests/dev/values.yaml
+    on_success:
+      annotations:
+        set:
+         - annotations:
+           - appVersion: ${{APPVERSION}}
+
+  send-slack-notification:
+    title: "Notify the team of the deployment status"
+    type: slack-message-sender:0.0.6
+    stage: "deploy"
+    arguments:
+      WEBHOOK_URL: "${{SLACK_URL}}"
+      MESSAGE: "Successfully built ${{APPVERSION}} of ${{APP_NAME}}"      

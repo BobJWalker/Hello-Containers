@@ -1,10 +1,9 @@
-using Allure.NUnit;
 using NUnit.Framework;
 using HelloContainers.Web.Models;
 
 namespace HelloContainers.Tests
 {
-    [AllureNUnit]
+    [TestFixture]
     public class Tests
     {
         [SetUp]

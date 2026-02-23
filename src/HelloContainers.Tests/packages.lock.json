@@ -2,16 +2,6 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
-      "Allure.NUnit": {
-        "type": "Direct",
-        "requested": "[2.14.1, )",
-        "resolved": "2.14.1",
-        "contentHash": "RQZDe/ukmKd5LoQqAiz4tHjwg/wZ553hvdhfREQZ/iBkjDv5R+mRcasracQAni7xvJhirVrCdZ9oZtZvlQGsgw==",
-        "dependencies": {
-          "Allure.Net.Commons": "2.14.1",
-          "NUnit": "3.13.3"
-        }
-      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.0.1, )",
@@ -37,21 +27,6 @@
           "Microsoft.Testing.Extensions.VSTestBridge": "2.0.2",
           "Microsoft.Testing.Platform.MSBuild": "2.0.2"
         }
-      },
-      "Allure.Net.Commons": {
-        "type": "Transitive",
-        "resolved": "2.14.1",
-        "contentHash": "n3IOOzS91SYIPtjkhagiOURqP0o0AH2Y3tsvNGOw37dpZlzDcl/I55GHAvQkkyFvahrdoNdAVcT7buB/ai1jhg==",
-        "dependencies": {
-          "AspectInjector": "2.8.1",
-          "MimeTypesMap": "1.0.9",
-          "Newtonsoft.Json": "13.0.4"
-        }
-      },
-      "AspectInjector": {
-        "type": "Transitive",
-        "resolved": "2.8.1",
-        "contentHash": "8BScDeaLazJVFaa2Tt9hoWLhllnxXP3Sew+l/vktdZEcgoPOsqhlDqe6GXJvy7xVkdICAbKFsrcDJ0cfrDR6Mg=="
       },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
@@ -129,15 +104,10 @@
         "resolved": "1.23.0",
         "contentHash": "2wDnb4umupJZ/1ikgWozFVpggH1mlHQFc0odXVv2ZagL3RYwXgW9zmC15fiqIBzmaC0vLZUnLGwDY+p8ZR7Syw=="
       },
-      "MimeTypesMap": {
-        "type": "Transitive",
-        "resolved": "1.0.9",
-        "contentHash": "M0TuSCwL1a8QV0VKw8ysY4AIs6v/Aor3N7GXQeqgNlAvqjx9Kj9KxNd09Pg5RzpY1tCOU8mkrfYBi1Lxwj8quQ=="
-      },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "13.0.4",
-        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "hellocontainers.web": {
         "type": "Project",

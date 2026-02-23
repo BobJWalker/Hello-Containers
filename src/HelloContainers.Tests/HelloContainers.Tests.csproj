@@ -13,10 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HelloContainers.Web\HelloContainers.Web.csproj" />      
-      <Content Include="allureConfig.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>    
+      <ProjectReference Include="..\HelloContainers.Web\HelloContainers.Web.csproj" />    
     </ItemGroup>    
 
     

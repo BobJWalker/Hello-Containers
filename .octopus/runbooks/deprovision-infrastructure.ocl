@@ -1,0 +1,75 @@
+name = "Deprovision Infrastructure"
+default_guided_failure_mode = "EnvironmentDefault"
+description = "Destroys all the infrastructure in Kubernetes necessary to run this application."
+
+connectivity_policy {
+    allow_deployments_to_no_targets = true
+}
+
+run_retention_policy {
+    type = "Default"
+}
+
+process {
+    step "azure-key-vault-retrieve-secrets" {
+        name = "Azure Key Vault - Retrieve Secrets"
+
+        action {
+            properties = {
+                Azure.KeyVault.RetrieveSecrets.Account = "KeyVault.Azure.Account"
+                Azure.KeyVault.RetrieveSecrets.PrintVariableNames = "False"
+                Azure.KeyVault.RetrieveSecrets.VaultName = "#{KeyVault.Azure.Name}"
+                Azure.KeyVault.RetrieveSecrets.VaultSecrets = "#{KeyVault.Azure.Secrets.List}"
+                Octopus.Action.Template.Id = "ActionTemplates-561"
+                Octopus.Action.Template.Version = "2"
+            }
+            worker_pool_variable = "Standards.Worker.Pool"
+
+            container {
+                feed = "dockerhub"
+                image = "#{Standards.Azure.ExecutionContainer}"
+            }
+        }
+    }
+
+    step "run-a-process-template-delete-kubernetes-namespace" {
+        name = "Run a Process Template-Delete Kubernetes Namespace"
+        properties = {
+            Octopus.Action.TargetRoles = "#{Template.Kubernetes.TargetTags}"
+        }
+
+        action {
+            action_type = "Octopus.KubernetesRunScript"
+            notes = <<-EOT
+                    **Always Runs**
+                    
+                    Deletes the tenant namespace from the Kubernetes Cluster.
+                    EOT
+            properties = {
+                Octopus.Action.Blueprint.ConsumingAction.Name = "Run a Process Template"
+                Octopus.Action.Script.ScriptBody = <<-EOT
+                    $namespace = $OctopusParameters["Template.Kubernetes.Namespace.Name"]
+                    
+                    kubectl delete namespace $namespace --now --wait
+                        
+                    if ($lastexitcode -eq 0)
+                    {
+                         write-host "The namespace $namespace was successfully deleted."
+                    }
+                    else
+                    {
+                         Write-Host "There was an error deleting the namespace $namespace.  Please check the Cluster UI to verify a deletion has occurred."
+                         Exit 0
+                    }
+                    EOT
+                Octopus.Action.Script.ScriptSource = "Inline"
+                Octopus.Action.Script.Syntax = "PowerShell"
+                Octopus.ProcessTemplate.Slug = "runbook-destroy-container-infrastructure"
+                Octopus.ProcessTemplate.Version = "1.0.1"
+                Template.Kubernetes.Namespace.Name = "#{Standards.K8s.Namespace}"
+                Template.Kubernetes.TargetTags = "hello-containers"
+            }
+            worker_pool_variable = ""
+        }
+    }
+}

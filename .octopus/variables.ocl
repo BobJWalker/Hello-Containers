@@ -1,0 +1,11 @@
+variable "metadata:namespace" {
+    value "#{Standards.K8s.Namespace}" {}
+}
+
+variable "spec:hostnames:0" {
+    value "#{Standards.K8s.HostName}" {}
+}
+
+variable "spec:template:spec:containers:0:image" {
+    value "bobjwalker99/hello-containers:#{Octopus.Action[Deploy Web App-Deploy Container].Package[K8sTemplate.Container].PackageVersion}" {}
+}

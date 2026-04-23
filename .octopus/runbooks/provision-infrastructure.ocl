@@ -43,7 +43,7 @@ process {
         }
 
         parameter "Template.Kubernetes.TargetTags" {
-            value = "spear-web"
+            value = "hello-containers-web"
         }
     }
 }

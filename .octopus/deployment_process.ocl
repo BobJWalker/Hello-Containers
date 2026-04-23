@@ -57,10 +57,6 @@ process_template "run-a-process-template" {
         package_id = "bobjwalker99/hello-containers"
     }
 
-    parameter "K8sTemplate.Target.Tag" {
-        value = "trident-web"
-    }
-
     parameter "K8sTemplate.Git.Repo" {
         value = "https://github.com/BobJWalker/Hello-Containers.git"
     }
@@ -79,6 +75,10 @@ process_template "run-a-process-template" {
 
     parameter "K8sTemplate.Branch.Name" {
         value = "main"
+    }
+
+    parameter "K8sTemplate.Target.Tag" {
+        value = "hello-containers-web"
     }
 }
 

@@ -11,55 +11,39 @@ run_retention_policy {
 }
 
 process {
-    step "azure-key-vault-retrieve-secrets" {
-        name = "Azure Key Vault - Retrieve Secrets"
+    process_template "key-vault" {
+        name = "Key Vault"
+        process_template_slug = "key-vault-retrieve-secrets"
+        version_mask = "2.X"
 
-        action {
-            properties = {
-                Azure.KeyVault.RetrieveSecrets.Account = "KeyVault.Azure.Account"
-                Azure.KeyVault.RetrieveSecrets.PrintVariableNames = "False"
-                Azure.KeyVault.RetrieveSecrets.VaultName = "#{KeyVault.Azure.Name}"
-                Azure.KeyVault.RetrieveSecrets.VaultSecrets = "#{KeyVault.Azure.Secrets.List}"
-                Octopus.Action.Template.Id = "ActionTemplates-561"
-                Octopus.Action.Template.Version = "2"
-            }
-            worker_pool_variable = "Standards.Worker.Pool"
+        parameter "KeyVault.Template.Vault.Name" {
+            value = "#{KeyVault.Azure.Name}"
+        }
 
-            container {
-                feed = "dockerhub"
-                image = "#{Standards.Azure.ExecutionContainer}"
-            }
+        parameter "KeyVault.Template.Secrets.List" {
+            value = "#{KeyVault.Azure.Secrets.List}"
+        }
+
+        parameter "KeyVault.Template.Worker.Pool" {
+            value = "#{Standards.Worker.Pool}"
+        }
+
+        parameter "KeyVault.Template.ExecutionContainer.Feed" {
+            value = "Feeds-1283"
         }
     }
 
-    step "run-a-process-template-create-application-namespace" {
-        name = "Run a Process Template-Create Application Namespace"
-        properties = {
-            Octopus.Action.TargetRoles = "#{Template.Kubernetes.TargetTags}"
+    process_template "provision-k8s-infrastructure" {
+        name = "Provision K8s Infrastructure"
+        process_template_slug = "create-container-infrastructure"
+        version_mask = "1.X"
+
+        parameter "Template.Kubernetes.Namespace.Name" {
+            value = "#{Standards.K8s.Namespace}"
         }
 
-        action {
-            action_type = "Octopus.KubernetesRunScript"
-            notes = <<-EOT
-                    **Always Runs**
-                    
-                    Applies the manifest file to ensure the namespace exists for this particular tenant.
-                    EOT
-            properties = {
-                Octopus.Action.Blueprint.ConsumingAction.Name = "Run a Process Template"
-                Octopus.Action.Script.ScriptBody = <<-EOT
-                    $namespace = $OctopusParameters["Template.Kubernetes.Namespace.Name"]
-                    
-                    kubectl create namespace $namespace --dry-run=client -o yaml | kubectl apply -f -
-                    EOT
-                Octopus.Action.Script.ScriptSource = "Inline"
-                Octopus.Action.Script.Syntax = "PowerShell"
-                Octopus.ProcessTemplate.Slug = "create-container-infrastructure"
-                Octopus.ProcessTemplate.Version = "1.0.1"
-                Template.Kubernetes.Namespace.Name = "#{Standards.K8s.Namespace}"
-                Template.Kubernetes.TargetTags = "hello-containers"
-            }
-            worker_pool_variable = ""
+        parameter "Template.Kubernetes.TargetTags" {
+            value = "spear-web"
         }
     }
 }

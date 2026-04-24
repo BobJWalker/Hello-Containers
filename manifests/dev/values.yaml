@@ -2,7 +2,7 @@ hello-helm:
   hello:
     homepageDisplaySecret: "blah"
     image:
-      tag: 1.5.17
+      tag: 1.5.18
       resources:
         requests:
           memory: "64Mi"

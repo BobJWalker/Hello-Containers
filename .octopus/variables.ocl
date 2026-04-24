@@ -9,3 +9,16 @@ variable "spec:hostnames:0" {
 variable "spec:template:spec:containers:0:image" {
     value "bobjwalker99/hello-containers:#{Octopus.Action[Deploy Web App-Deploy Container].Package[K8sTemplate.Container].PackageVersion}" {}
 }
+
+variable "Project.Simulate.Failure" {
+    value "False" {
+        prompt {
+            description = ""
+            display_settings = {
+                Octopus.ControlType = "Checkbox"
+            }
+            label = "Simulate Failure"
+            required = true
+        }
+    }
+}

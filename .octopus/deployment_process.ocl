@@ -47,6 +47,29 @@ process_template "verify-supply-chain" {
     }
 }
 
+step "chaos-monkey" {
+    condition = "Variable"
+    name = "Chaos Monkey"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Simulate.Failure}#{/unless}"
+    }
+
+    action {
+        action_type = "Octopus.Script"
+        notes = "**Runs on conditional**"
+        properties = {
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                Write-Highlight "Simulating a failure to test resilency"
+                Exit 0
+                EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "Standards.Worker.Pool"
+    }
+}
+
 process_template "run-a-process-template" {
     name = "Deploy Web App"
     process_template_slug = "deploy-kubernetes-manifests"

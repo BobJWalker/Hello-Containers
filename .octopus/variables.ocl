@@ -12,6 +12,8 @@ variable "spec:template:spec:containers:0:image" {
 
 variable "Project.Simulate.Failure" {
     value "False" {
+        process = ["deployment-process"]
+
         prompt {
             description = ""
             display_settings = {

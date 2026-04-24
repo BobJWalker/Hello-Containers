@@ -56,11 +56,16 @@ step "chaos-monkey" {
 
     action {
         action_type = "Octopus.Script"
-        notes = "**Runs on conditional**"
+        notes = <<-EOT
+                **Runs on conditional**
+                
+                Will simulate a failure so we can react to a failed deployment and debug
+                EOT
         properties = {
             Octopus.Action.Script.ScriptBody = <<-EOT
-                Write-Highlight "Simulating a failure to test resilency"
-                Exit 0
+                Write-Highlight "Simulating a failure to test resilency and response time"
+                
+                Invoke-RestMethod -Method GET -Uri "https://bobjwalker.octopus.app/api/tasks" -Headers @{"X-Octopus-ApiKey" = "An Incorrect Key" } -ContentType 'application/json; charset=utf-8' -TimeoutSec 60
                 EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"

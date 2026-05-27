@@ -12,4 +12,50 @@ run_retention_policy {
     type = "Default"
 }
 
-process {}
+process {
+    process_template "key-vault" {
+        name = "Key Vault"
+        process_template_slug = "key-vault-retrieve-secrets"
+        version_mask = "2.X"
+
+        parameter "KeyVault.Template.Vault.Name" {
+            value = "#{KeyVault.Azure.Name}"
+        }
+
+        parameter "KeyVault.Template.Secrets.List" {
+            value = "#{KeyVault.Azure.Secrets.List}"
+        }
+
+        parameter "KeyVault.Template.Worker.Pool" {
+            value = "#{Standards.Worker.Pool}"
+        }
+
+        parameter "KeyVault.Template.ExecutionContainer.Feed" {
+            value = "Feeds-1283"
+        }
+    }
+
+    process_template "restart-app" {
+        name = "Restart App"
+        process_template_slug = "runbook-restart-stuck-k8s-application"
+        version_mask = "1.X"
+
+        parameter "Template.Target.Tags" {
+            value = "hello-containers"
+        }
+
+        parameter "Template.Namespace.Name" {
+            value = "#{Standards.K8s.Namespace}"
+        }
+    }
+
+    process_template "notify-platform-engineers" {
+        name = "Notify Platform Engineers"
+        process_template_slug = "notification-emails"
+        version_mask = "1.X"
+
+        parameter "Template.EmailTeam" {
+            value = "Teams-81"
+        }
+    }
+}

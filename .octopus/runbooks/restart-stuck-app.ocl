@@ -42,12 +42,12 @@ process {
         process_template_slug = "runbook-restart-stuck-k8s-application"
         version_mask = "1.X"
 
-        parameter "Template.Target.Tags" {
-            value = "hello-containers"
-        }
-
         parameter "Template.Namespace.Name" {
             value = "#{Standards.K8s.Namespace}"
+        }
+
+        parameter "Template.Target.Tags" {
+            value = "hello-containers-web"
         }
     }
 

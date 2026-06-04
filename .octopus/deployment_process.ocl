@@ -23,7 +23,7 @@ process_template "key-vault" {
 process_template "verify-supply-chain" {
     name = "Verify Supply Chain"
     process_template_slug = "deploy-process-verify-build-artifacts"
-    version_mask = "2.16.X"
+    version_mask = "2.17.X"
 
     package_parameter "Template.SBOM.Artifact" {
         feed = "octopus-server-built-in"

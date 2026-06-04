@@ -7,6 +7,35 @@
         "requested": "[1.23.0, )",
         "resolved": "1.23.0",
         "contentHash": "2wDnb4umupJZ/1ikgWozFVpggH1mlHQFc0odXVv2ZagL3RYwXgW9zmC15fiqIBzmaC0vLZUnLGwDY+p8ZR7Syw=="
+      },
+      "Octopus.OpenFeature": {
+        "type": "Direct",
+        "requested": "[2.1.0, )",
+        "resolved": "2.1.0",
+        "contentHash": "t/rtZ9uUyLUGf78mIs1KGFRyg9Q0eV68kpXCnfZUTdDZXf3ff9dEPzoPLB2K7MmUuV1v3KEQAcdjMrCTn2Ak9g==",
+        "dependencies": {
+          "OpenFeature": "2.11.1",
+          "murmurhash": "1.0.3"
+        }
+      },
+      "OpenFeature.Contrib.Providers.EnvVar": {
+        "type": "Direct",
+        "requested": "[0.0.7, )",
+        "resolved": "0.0.7",
+        "contentHash": "1zhPsni15bMpPkBI7EMzeApDxIqXhGp0tQm9IumH+aEWLva7TthLPsBwpbdkN0DdAMOg80XmXkhCJi34neqjhQ==",
+        "dependencies": {
+          "OpenFeature": "[2.0.0, 3.0.0)"
+        }
+      },
+      "murmurhash": {
+        "type": "Transitive",
+        "resolved": "1.0.3",
+        "contentHash": "56dW8jgSsvGs/tULn+r1UbS+o0rBvgMj+6Lta6uao4j8Kzx1kVxMf56LPKO070VqjWcGyMB4K4R6M4gVKutG9A=="
+      },
+      "OpenFeature": {
+        "type": "Transitive",
+        "resolved": "2.11.1",
+        "contentHash": "cxm8fgi5I2UPguBK7TQgvSn5X/1KWI9ImpSjIL8EvTNVrK4c2d9a+r+EUEIED0cXJ2kWB01zInJ4ZOBoGIqysw=="
       }
     }
   }

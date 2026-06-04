@@ -22,6 +22,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "HelloContainers.Web.dll"]
-ENV HELLO_SECRET_PHRASE=blah
+ENV HELLO_SECRET_PHRASE="blah"
 ENV ASPNETCORE_URLS="http://+:8080"
 ENV ASPNETCORE_ENVIRONMENT="Production"
+ENV OPEN_FEATURE_CLIENT_ID="blah"

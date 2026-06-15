@@ -31,9 +31,9 @@
       },
       "Octopus.OpenFeature": {
         "type": "Direct",
-        "requested": "[2.1.0, )",
-        "resolved": "2.1.0",
-        "contentHash": "t/rtZ9uUyLUGf78mIs1KGFRyg9Q0eV68kpXCnfZUTdDZXf3ff9dEPzoPLB2K7MmUuV1v3KEQAcdjMrCTn2Ak9g==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "vW4qIyIVNW0HKNIkE2LAWURQEKT5tfRMeXPzw2q8EpD2eo4fepaex0PlvQZDFsIu0X0XCT5AjR9xhH52vIIbNQ==",
         "dependencies": {
           "OpenFeature": "2.11.1",
           "murmurhash": "1.0.3"
@@ -157,7 +157,7 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.23.0, )",
-          "Octopus.OpenFeature": "[2.1.0, )",
+          "Octopus.OpenFeature": "[3.0.0, )",
           "OpenFeature.Contrib.Providers.EnvVar": "[0.0.7, )"
         }
       }
